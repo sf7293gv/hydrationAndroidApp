@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.RatingBar
 import java.time.DayOfWeek
 
 // TODO: Rename parameter arguments, choose names that match
@@ -21,6 +23,16 @@ class HydrationFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private lateinit var dayOfWeek: String
 
+    private lateinit var waterRatingBar: RatingBar
+    private lateinit var addGlassButton: ImageButton
+    private lateinit var resetGlassesButton: ImageButton
+
+    private lateinit var waterRecord: WaterRecord
+
+    private val waterViewModel by lazy {
+        WaterViewModelFactory((requireActivity().application as HydrationApplication).repository).create(WaterViewModel::class.java)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +46,48 @@ class HydrationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_hydration, container, false)
+        val view =  inflater.inflate(R.layout.fragment_hydration, container, false)
+
+        waterRatingBar = view.findViewById(R.id.water_rating_bar)
+        addGlassButton = view.findViewById(R.id.add_glass_button)
+        resetGlassesButton = view.findViewById(R.id.reset_count_button)
+
+        // todo add event listeners to buttons
+
+        waterViewModel.getRecordForDay(dayOfWeek).observe(requireActivity()) { wr ->
+            if (wr == null) {
+                waterViewModel.insertNewRecord(WaterRecord(dayOfWeek, 0))
+            } else {
+                waterRecord = wr
+                waterRatingBar.progress = waterRecord.glasses
+
+                addGlassButton.setOnClickListener {
+                    addGlass()
+                }
+
+                resetGlassesButton.setOnClickListener {
+                    resetGlasses()
+                }
+
+            }
+
+        }
+
+        return view
+    }
+
+    private fun addGlass(){
+        // add 1 to total glasses, not more than 5
+
+        if (waterRecord.glasses < resources.getInteger(R.integer.max_glasses)) {
+            waterRecord.glasses++
+            waterViewModel.updateRecord(waterRecord)
+        }
+    }
+
+    private fun resetGlasses(){
+        waterRecord.glasses = 0
+        waterViewModel.updateRecord(waterRecord)
     }
 
     companion object {

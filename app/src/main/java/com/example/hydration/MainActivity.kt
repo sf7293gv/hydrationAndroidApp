@@ -14,10 +14,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val tuesday = WaterRecord("Tuesday", 4)
-        waterViewModel.insertNewRecord(tuesday)
-        val wednesday = WaterRecord("Wednesday", 4)
-        waterViewModel.insertNewRecord(wednesday)
+//        val tuesday = WaterRecord("Tuesday", 4)
+//        waterViewModel.insertNewRecord(tuesday)
+//        val wednesday = WaterRecord("Wednesday", 4)
+//        waterViewModel.insertNewRecord(wednesday)
 
         waterViewModel.allRecords.observe(this) { records ->
             Log.d("MAIN_ACTIVITY", "$records")
